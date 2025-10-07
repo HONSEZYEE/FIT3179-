@@ -87,8 +87,23 @@
       }
     };
 
-    vegaEmbed('#vis', spec).then(console.log).catch(console.warn);
+
+    function updateChart(category) {
+    const spec = JSON.parse(JSON.stringify(specBase));
+    spec.transform = [{"filter": "datum.category == '" + category + "'"}];
+    vegaEmbed('#vis', spec, {actions: false});
+      }
+
+
+    updateChart('Music');
+
+    document.getElementById('categorySelect').addEventListener('change', (e) => {
+    updateChart(e.target.value);
+      });
+    
+    
   </script>
 </body>
 </html>
+
 
