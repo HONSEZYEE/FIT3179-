@@ -1,0 +1,89 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 900,
+  "height": 480,
+  "projection": {"type": "naturalEarth1"},
+  "config": {"view": {"stroke": null}},
+  "data": {
+    "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/Global_YouTube_Statistics_UTF8.csv"
+  },
+  "transform": [
+    {
+      "filter": "isValid(datum.Latitude) && isValid(datum.Longitude) && datum.Latitude != 0 && datum.Longitude != 0"
+    },
+    {
+      "aggregate": [
+        {"op": "sum", "field": "subscribers", "as": "subs_sum"},
+        {"op": "mean", "field": "Latitude", "as": "lat"},
+        {"op": "mean", "field": "Longitude", "as": "lon"}
+      ],
+      "groupby": ["Country"]
+    }
+  ],
+  "layer": [
+    {
+      "data": {"sphere": true},
+      "mark": {
+        "type": "geoshape",
+        "fill": "#c7e3f4",
+        "stroke": "#6baed6",
+        "strokeWidth": 0.8
+      }
+    },
+    {
+      "data": {
+        "graticule": {"step": [45, 45], "extent": [[-180, -90], [180, 90]]}
+      },
+      "mark": {"type": "geoshape", "stroke": "#cbd5e1", "strokeWidth": 0.4}
+    },
+    {
+      "data": {
+        "url": "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
+        "format": {"type": "topojson", "feature": "countries"}
+      },
+      "mark": {"type": "geoshape", "fill": "#fdf3f0", "stroke": null}
+    },
+    {
+      "mark": {
+        "type": "circle",
+        "opacity": 1,
+        "stroke": "#ffffff",
+        "strokeWidth": 0.6
+      },
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "size": {
+          "field": "subs_sum",
+          "type": "quantitative",
+          "title": "Total Subscribers",
+          "scale": {
+            "type": "sqrt",
+            "domain": [50000000, 3000000000],
+            "range": [20, 1500]
+          }
+        },
+        "legend": {
+          "values": [50000000, 200000000, 500000000, 1000000000, 3000000000]
+        },
+        "color": {"value": "#f6a11a"},
+        "tooltip": [
+          {"field": "Country", "title": "Country"},
+          {"field": "subs_sum", "title": "Total Subscribers", "format": ","}
+        ]
+      }
+    },
+    {
+      "data": {
+        "url": "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
+        "format": {"type": "topojson", "feature": "countries"}
+      },
+      "mark": {
+        "type": "geoshape",
+        "fill": null,
+        "stroke": "#6b7280",
+        "strokeWidth": 0.4
+      }
+    }
+  ]
+}

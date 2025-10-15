@@ -1,0 +1,106 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 780,
+  "height": 480,
+  "data": {
+    "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/main/Global_YouTube_Statistics_UTF8.csv"
+  },
+  "transform": [
+    {
+      "filter": "isValid(datum.highest_monthly_earnings) && datum.highest_monthly_earnings > 0"
+    },
+    {
+      "filter": "datum.highest_monthly_earnings <= 2000000 && datum.highest_monthly_earnings >= 0"
+    },
+    {
+      "filter": {
+        "field": "Country",
+        "oneOf": [
+          "South Korea",
+          "India",
+          "Russia",
+          "United States",
+          "United Kingdom",
+          "Canada"
+        ]
+      }
+    },
+    {
+      "joinaggregate": [
+        {
+          "op": "median",
+          "field": "highest_monthly_earnings",
+          "as": "med_income_country"
+        },
+        {
+          "op": "count",
+          "field": "highest_monthly_earnings",
+          "as": "n_channels_country"
+        }
+      ],
+      "groupby": ["Country"]
+    }
+  ],
+  "mark": {"type": "boxplot", "extent": 1.5, "median": {"color": "#111827"}},
+  "encoding": {
+    "y": {
+      "field": "Country",
+      "type": "nominal",
+      "title": "Country",
+      "sort": {"field": "med_income_country", "order": "descending"},
+      "scale": {"padding": 0.3}
+    },
+    "x": {
+      "field": "highest_monthly_earnings",
+      "type": "quantitative",
+      "title": "Highest Monthly Earnings",
+      "scale": {"type": "linear", "zero": true, "domain": [0, 2000000]},
+      "axis": {"grid": true, "format": ","}
+    },
+    "color": {
+      "field": "Country",
+      "type": "nominal",
+      "legend": null,
+      "scale": {"scheme": "set3"}
+    },
+    "tooltip": [
+      {"field": "Country"},
+      {
+        "aggregate": "count",
+        "field": "highest_monthly_earnings",
+        "title": "Channels"
+      },
+      {
+        "aggregate": "median",
+        "field": "highest_monthly_earnings",
+        "title": "Median",
+        "format": ","
+      },
+      {
+        "aggregate": "q1",
+        "field": "highest_monthly_earnings",
+        "title": "Q1",
+        "format": ","
+      },
+      {
+        "aggregate": "q3",
+        "field": "highest_monthly_earnings",
+        "title": "Q3",
+        "format": ","
+      },
+      {
+        "aggregate": "min",
+        "field": "highest_monthly_earnings",
+        "title": "Min",
+        "format": ","
+      },
+      {
+        "aggregate": "max",
+        "field": "highest_monthly_earnings",
+        "title": "Max",
+        "format": ","
+      }
+    ]
+  },
+  "config": {"view": {"stroke": null}, "background": "white"}
+}

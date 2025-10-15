@@ -1,0 +1,151 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "width": 640,
+  "height": 420,
+  "data": {
+    "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/Global_YouTube_Statistics_UTF8.csv"
+  },
+  "params": [
+    {
+      "name": "countrySel",
+      "value": "All Countries",
+      "bind": {
+        "input": "select",
+        "name": "Country: ",
+        "options": [
+          "All Countries",
+          "United States",
+          "India",
+          "Brazil",
+          "United Kingdom",
+          "Indonesia",
+          "Japan",
+          "Mexico",
+          "Russia",
+          "Germany",
+          "France",
+          "South Korea",
+          "Turkey",
+          "Spain",
+          "Italy",
+          "Canada",
+          "Australia",
+          "Malaysia",
+          "Thailand",
+          "Philippines",
+          "Vietnam"
+        ]
+      }
+    }
+  ],
+  "transform": [
+    {"filter": "countrySel == 'All Countries' || datum.Country == countrySel"},
+    {"filter": "isValid(datum.subscribers) && datum.subscribers > 0"},
+    {
+      "aggregate": [
+        {"op": "mean", "field": "subscribers", "as": "mean_subs"},
+        {"op": "count", "as": "n_channels"}
+      ],
+      "groupby": ["category"]
+    },
+    {
+      "window": [{"op": "rank", "as": "rk"}],
+      "sort": [{"field": "mean_subs", "order": "descending"}]
+    },
+    {"filter": "datum.rk <= 10"},
+    {
+      "lookup": "category",
+      "from": {
+        "data": {
+          "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/Global_YouTube_Statistics_UTF8.csv"
+        },
+        "transform": [
+          {"filter": "isValid(datum.subscribers) && datum.subscribers > 0"},
+          {
+            "aggregate": [
+              {"op": "mean", "field": "subscribers", "as": "mean_subs_global"}
+            ],
+            "groupby": ["category"]
+          }
+        ],
+        "key": "category"
+      },
+      "as": "global"
+    },
+    {"calculate": "datum.global.mean_subs_global", "as": "mean_subs_global"}
+  ],
+  "layer": [
+    {
+      "mark": {
+        "type": "rule",
+        "stroke": "#dc2626",
+        "strokeWidth": 2,
+        "opacity": 0.9
+      },
+      "encoding": {
+        "y": {"field": "category", "type": "nominal", "sort": "-x"},
+        "x": {"field": "mean_subs_global", "type": "quantitative"}
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "align": "left",
+        "dx": 6,
+        "dy": -6,
+        "color": "#dc2626"
+      },
+      "encoding": {
+        "y": {"field": "category", "type": "nominal", "sort": "-x"},
+        "x": {"field": "mean_subs_global", "type": "quantitative"},
+        "text": {
+          "field": "mean_subs_global",
+          "type": "quantitative",
+          "format": ","
+        }
+      }
+    },
+    {
+      "params": [
+        {
+          "name": "selCategory",
+          "select": {
+            "type": "point",
+            "fields": ["category"],
+            "on": "click",
+            "clear": "dblclick",
+            "empty": "all"
+          }
+        }
+      ],
+      "mark": {"type": "bar", "cursor": "pointer"},
+      "encoding": {
+        "y": {
+          "field": "category",
+          "type": "nominal",
+          "title": "Category",
+          "sort": "-x"
+        },
+        "x": {
+          "field": "mean_subs",
+          "type": "quantitative",
+          "title": "Mean Subscribers",
+          "axis": {"grid": true}
+        },
+        "color": {
+          "field": "category",
+          "type": "nominal",
+          "legend": null,
+          "scale": {"scheme": "set2"}
+        },
+        "tooltip": [
+          {"field": "category", "title": "Category"},
+          {"field": "mean_subs", "title": "Mean Subscribers", "format": ","},
+          {"field": "mean_subs_global", "title": "Global Mean", "format": ","},
+          {"field": "n_channels", "title": "Channel Count"}
+        ]
+      }
+    }
+  ],
+  "config": {"view": {"stroke": null}, "background": "white"}
+}
