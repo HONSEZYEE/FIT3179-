@@ -31,9 +31,7 @@
       }
     },
     {
-      "data": {
-        "graticule": {"step": [45, 45], "extent": [[-180, -90], [180, 90]]}
-      },
+      "data": {"graticule": {"step": [45, 45], "extent": [[-180, -90], [180, 90]]}},
       "mark": {"type": "geoshape", "stroke": "#cbd5e1", "strokeWidth": 0.4}
     },
     {
@@ -44,12 +42,7 @@
       "mark": {"type": "geoshape", "fill": "#fdf3f0", "stroke": null}
     },
     {
-      "mark": {
-        "type": "circle",
-        "opacity": 1,
-        "stroke": "#ffffff",
-        "strokeWidth": 0.6
-      },
+      "mark": {"type": "circle", "opacity": 1, "stroke": "#ffffff", "strokeWidth": 0.6},
       "encoding": {
         "longitude": {"field": "lon", "type": "quantitative"},
         "latitude": {"field": "lat", "type": "quantitative"},
@@ -57,14 +50,10 @@
           "field": "subs_sum",
           "type": "quantitative",
           "title": "Total Subscribers",
-          "scale": {
-            "type": "sqrt",
-            "domain": [50000000, 3000000000],
-            "range": [20, 1500]
+          "scale": {"type": "sqrt", "domain": [50000000, 3000000000], "range": [20, 1500]},
+          "legend": {
+            "values": [50000000, 200000000, 500000000, 1000000000, 3000000000]
           }
-        },
-        "legend": {
-          "values": [50000000, 200000000, 500000000, 1000000000, 3000000000]
         },
         "color": {"value": "#f6a11a"},
         "tooltip": [
@@ -78,11 +67,27 @@
         "url": "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
         "format": {"type": "topojson", "feature": "countries"}
       },
+      "mark": {"type": "geoshape", "fill": null, "stroke": "#6b7280", "strokeWidth": 0.4}
+    },
+    {
+      "transform": [
+        {"window": [{"op": "rank", "as": "r"}], "sort": [{"field": "subs_sum", "order": "descending"}]},
+        {"filter": "datum.r <= 10"}
+      ],
       "mark": {
-        "type": "geoshape",
-        "fill": null,
-        "stroke": "#6b7280",
-        "strokeWidth": 0.4
+        "type": "text",
+        "font": "Inter, Arial, sans-serif",
+        "fontSize": 11,
+        "fontWeight": "bold",
+        "fill": "#374151"
+      },
+      "encoding": {
+        "longitude": {"field": "lon", "type": "quantitative"},
+        "latitude": {"field": "lat", "type": "quantitative"},
+        "text": {"field": "Country"},
+        "dx": {"expr": "datum.lon > 0 ? 6 : -6"},
+        "align": {"expr": "datum.lon > 0 ? 'left' : 'right'"},
+        "baseline": {"value": "middle"}
       }
     }
   ]
