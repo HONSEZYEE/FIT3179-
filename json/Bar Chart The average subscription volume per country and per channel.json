@@ -39,20 +39,24 @@
     }
   ],
   "transform": [
-    {"filter": "countrySel == 'All Countries' || datum.Country == countrySel"},
-    {"filter": "isValid(datum.subscribers) && datum.subscribers > 0"},
+    { "filter": "countrySel == 'All Countries' || datum.Country == countrySel" },
+    { "filter": "isValid(datum.subscribers) && datum.subscribers > 0" },
+    { "filter": "isValid(datum.category) && datum.category != ''" },
     {
       "aggregate": [
-        {"op": "mean", "field": "subscribers", "as": "mean_subs"},
-        {"op": "count", "as": "n_channels"}
+        { "op": "mean", "field": "subscribers", "as": "mean_subs" },
+        { "op": "count", "as": "n_channels" }
       ],
       "groupby": ["category"]
     },
     {
-      "window": [{"op": "rank", "as": "rk"}],
-      "sort": [{"field": "mean_subs", "order": "descending"}]
+      "window": [
+        { "op": "rank", "as": "rk" },
+        { "op": "max", "field": "mean_subs", "as": "max_subs" }
+      ],
+      "sort": [{ "field": "mean_subs", "order": "descending" }]
     },
-    {"filter": "datum.rk <= 10"},
+    { "filter": "datum.rk <= 10" },
     {
       "lookup": "category",
       "from": {
@@ -60,10 +64,11 @@
           "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/Global_YouTube_Statistics_UTF8.csv"
         },
         "transform": [
-          {"filter": "isValid(datum.subscribers) && datum.subscribers > 0"},
+          { "filter": "isValid(datum.subscribers) && datum.subscribers > 0" },
+          { "filter": "isValid(datum.category) && datum.category != ''" },
           {
             "aggregate": [
-              {"op": "mean", "field": "subscribers", "as": "mean_subs_global"}
+              { "op": "mean", "field": "subscribers", "as": "mean_subs_global" }
             ],
             "groupby": ["category"]
           }
@@ -72,7 +77,11 @@
       },
       "as": "global"
     },
-    {"calculate": "datum.global.mean_subs_global", "as": "mean_subs_global"}
+    { "calculate": "datum.global.mean_subs_global", "as": "mean_subs_global" },
+    {
+      "calculate": "(isValid(datum.mean_subs_global) && isFinite(datum.mean_subs_global)) ? datum.mean_subs_global : null",
+      "as": "mean_subs_global_safe"
+    }
   ],
   "layer": [
     {
@@ -82,9 +91,10 @@
         "strokeWidth": 2,
         "opacity": 0.9
       },
+      "transform": [{ "filter": "isFinite(datum.mean_subs_global)" }],
       "encoding": {
-        "y": {"field": "category", "type": "nominal", "sort": "-x"},
-        "x": {"field": "mean_subs_global", "type": "quantitative"}
+        "y": { "field": "category", "type": "nominal", "sort": "-x" },
+        "x": { "field": "mean_subs_global", "type": "quantitative" }
       }
     },
     {
@@ -95,9 +105,10 @@
         "dy": -6,
         "color": "#dc2626"
       },
+      "transform": [{ "filter": "isFinite(datum.mean_subs_global)" }],
       "encoding": {
-        "y": {"field": "category", "type": "nominal", "sort": "-x"},
-        "x": {"field": "mean_subs_global", "type": "quantitative"},
+        "y": { "field": "category", "type": "nominal", "sort": "-x" },
+        "x": { "field": "mean_subs_global", "type": "quantitative" },
         "text": {
           "field": "mean_subs_global",
           "type": "quantitative",
@@ -106,19 +117,7 @@
       }
     },
     {
-      "params": [
-        {
-          "name": "selCategory",
-          "select": {
-            "type": "point",
-            "fields": ["category"],
-            "on": "click",
-            "clear": "dblclick",
-            "empty": "all"
-          }
-        }
-      ],
-      "mark": {"type": "bar", "cursor": "pointer"},
+      "mark": { "type": "bar", "cursor": "pointer" },
       "encoding": {
         "y": {
           "field": "category",
@@ -130,22 +129,23 @@
           "field": "mean_subs",
           "type": "quantitative",
           "title": "Mean Subscribers",
-          "axis": {"grid": true}
+          "axis": { "grid": true }
         },
         "color": {
-          "field": "category",
-          "type": "nominal",
-          "legend": null,
-          "scale": {"scheme": "set2"}
+          "condition": {
+            "test": "datum.mean_subs === datum.max_subs",
+            "value": "#f59e0b"   // 橙色（你上传的图片颜色）
+          },
+          "value": "#d1d5db"     // 灰色
         },
         "tooltip": [
-          {"field": "category", "title": "Category"},
-          {"field": "mean_subs", "title": "Mean Subscribers", "format": ","},
-          {"field": "mean_subs_global", "title": "Global Mean", "format": ","},
-          {"field": "n_channels", "title": "Channel Count"}
+          { "field": "category", "title": "Category" },
+          { "field": "mean_subs", "title": "Mean Subscribers", "format": "," },
+          { "field": "mean_subs_global_safe", "title": "Global Mean", "format": "," },
+          { "field": "n_channels", "title": "Channel Count" }
         ]
       }
     }
   ],
-  "config": {"view": {"stroke": null}, "background": "white"}
+  "config": { "view": { "stroke": null }, "background": "white" }
 }
