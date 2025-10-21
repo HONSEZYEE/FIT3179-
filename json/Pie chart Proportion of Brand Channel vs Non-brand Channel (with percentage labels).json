@@ -1,0 +1,59 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+  "description": "Donut chart: Brand vs Non-Brand Channels (with percentage labels)",
+  "data": { 
+    "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/YouTube_channels.csv" 
+  },
+  "transform": [
+    { "calculate": "lower(trim(datum['Brand channel']))", "as": "brand_norm" },
+    {
+      "calculate": "datum.brand_norm=='yes' || datum.brand_norm=='true' || datum.brand_norm=='1' ? 'Brand' : 'Non-Brand'",
+      "as": "BrandGroup"
+    },
+    {
+      "aggregate": [{ "op": "count", "as": "ChannelCount" }],
+      "groupby": ["BrandGroup"]
+    },
+    { "joinaggregate": [{ "op": "sum", "field": "ChannelCount", "as": "TotalChannels" }] },
+    { "calculate": "datum.ChannelCount / datum.TotalChannels", "as": "Percent" },
+    { "calculate": "format(datum.Percent * 100, '.0f') + '%'", "as": "PercentLabel" },
+    { "sort": [{ "field": "BrandGroup", "order": "descending" }] }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "arc", "innerRadius": 60, "outerRadius": 100 },
+      "encoding": {
+        "theta": { "field": "ChannelCount", "type": "quantitative", "title": "Channel Count" },
+        "color": {
+          "field": "BrandGroup",
+          "type": "nominal",
+          "title": "Channel Type",
+          "scale": { "range": ["#FF6F61", "#9EE0D8"] }
+        },
+        "tooltip": [
+          { "field": "BrandGroup", "title": "Channel Type" },
+          { "field": "ChannelCount", "title": "Number of Channels" },
+          { "field": "PercentLabel", "title": "Share" }
+        ],
+        "order": { "field": "BrandGroup", "sort": "descending" }
+      }
+    },
+    {
+      "mark": {
+        "type": "text",
+        "radius": 100,
+        "dy": -80,
+        "fontSize": 14,
+        "fontWeight": "bold",
+        "fill": "white"
+      },
+      "encoding": {
+        "theta": { "field": "ChannelCount", "type": "quantitative" },
+        "text": { "field": "PercentLabel" }
+      }
+    }
+  ],
+  "view": { "stroke": null },
+  "width": 400,
+  "height": 400
+}
