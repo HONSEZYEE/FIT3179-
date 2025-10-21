@@ -2,143 +2,80 @@
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
   "width": 860,
   "height": 420,
+
   "data": {
     "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/main/Global_YouTube_Statistics_UTF8.csv"
   },
+
   "params": [
     {
       "name": "startYear",
       "value": 2010,
-      "bind": {
-        "input": "range",
-        "min": 2005,
-        "max": 2025,
-        "step": 1,
-        "name": "Start Year: "
-      }
+      "bind": { "input": "range", "min": 2005, "max": 2025, "step": 1, "name": "Start Year: " }
     },
     {
       "name": "endYear",
       "value": 2023,
-      "bind": {
-        "input": "range",
-        "min": 2005,
-        "max": 2025,
-        "step": 1,
-        "name": "End Year: "
-      }
+      "bind": { "input": "range", "min": 2005, "max": 2025, "step": 1, "name": "End Year: " }
     },
     {
       "name": "selectedCountry",
       "value": "United States",
       "bind": {
         "input": "select",
-        "options": [
-          "United States",
-          "India",
-          "South Korea",
-          "Russia",
-          "United Kingdom",
-          "Canada",
-          "Japan",
-          "Brazil"
-        ],
+        "options": ["United States", "India", "South Korea", "Russia", "United Kingdom", "Canada", "Japan", "Brazil"],
         "name": "Select Country: "
       }
     }
   ],
+
   "transform": [
-    {"filter": "isValid(datum.created_year) && isValid(datum.Country)"},
-    {"calculate": "toNumber(datum.created_year)", "as": "year"},
-    {"filter": "datum.Country == selectedCountry"},
+    { "filter": "isValid(datum.created_year) && isValid(datum.Country)" },
+    { "calculate": "toNumber(datum.created_year)", "as": "year" },
+    { "filter": "datum.Country == selectedCountry" },
+    { "aggregate": [{ "op": "count", "as": "yearly_count" }], "groupby": ["created_year", "Country"] },
     {
-      "aggregate": [{"op": "count", "as": "yearly_count"}],
-      "groupby": ["created_year", "Country"]
-    },
-    {
-      "window": [{"op": "sum", "field": "yearly_count", "as": "cum_count"}],
-      "sort": [{"field": "created_year", "order": "ascending"}],
+      "window": [{ "op": "sum", "field": "yearly_count", "as": "cum_count" }],
+      "sort": [{ "field": "created_year", "order": "ascending" }],
       "groupby": ["Country"]
     },
-    {
-      "filter": "datum.created_year >= startYear && datum.created_year <= endYear"
-    }
+    { "filter": "datum.created_year >= startYear && datum.created_year <= endYear" }
   ],
+
+  "encoding": {
+    "x": { "field": "created_year", "type": "ordinal", "title": "Year", "axis": { "format": "d" } },
+    "y": { "field": "yearly_count", "type": "quantitative", "title": "New Channels", "axis": { "orient": "left" } }
+  },
+
   "layer": [
     {
-      "mark": {
-        "type": "rule",
-        "stroke": "#9CA3AF",
-        "strokeDash": [4, 4],
-        "opacity": 0.9
-      },
-      "transform": [{"calculate": "startYear", "as": "created_year"}],
-      "encoding": {"x": {"field": "created_year", "type": "ordinal"}}
-    },
-    {
-      "mark": {
-        "type": "rule",
-        "stroke": "#9CA3AF",
-        "strokeDash": [4, 4],
-        "opacity": 0.9
-      },
-      "transform": [{"calculate": "endYear", "as": "created_year"}],
-      "encoding": {"x": {"field": "created_year", "type": "ordinal"}}
-    },
-    {
-      "mark": {
-        "type": "area",
-        "interpolate": "monotone",
-        "opacity": 0.25,
-        "color": "#EAB308"
-      },
+      "mark": { "type": "area", "interpolate": "monotone", "opacity": 0.25, "color": "#EAB308" },
       "encoding": {
-        "x": {
-          "field": "created_year",
-          "type": "ordinal",
-          "title": "Year",
-          "axis": {"format": "d"}
-        },
-        "y": {
-          "field": "yearly_count",
-          "type": "quantitative",
-          "axis": {"orient": "left"}
-        },
         "tooltip": [
-          {"field": "created_year", "title": "Year"},
-          {"field": "yearly_count", "title": "New Channels"},
-          {"field": "cum_count", "title": "Cumulative"}
+          { "field": "created_year", "title": "Year" },
+          { "field": "yearly_count", "title": "New Channels" },
+          { "field": "cum_count", "title": "Cumulative" }
         ]
       }
     },
     {
-      "mark": {
-        "type": "line",
-        "interpolate": "monotone",
-        "strokeWidth": 2,
-        "color": "#7C3AED"
-      },
+      "mark": { "type": "line", "interpolate": "monotone", "strokeWidth": 2, "color": "#7C3AED" },
       "encoding": {
-        "x": {"field": "created_year"},
-        "y": {"field": "yearly_count"},
         "tooltip": [
-          {"field": "created_year", "title": "Year"},
-          {"field": "yearly_count", "title": "New Channels"},
-          {"field": "cum_count", "title": "Cumulative"}
+          { "field": "created_year", "title": "Year" },
+          { "field": "yearly_count", "title": "New Channels" },
+          { "field": "cum_count", "title": "Cumulative" }
         ]
       }
     },
-    {
-      "mark": {"type": "point", "filled": true, "size": 60, "color": "#7C3AED"},
-      "encoding": {
-        "x": {"field": "created_year"},
-        "y": {"field": "yearly_count", "axis": null}
-      }
-    }
+    { "mark": { "type": "point", "filled": true, "size": 60, "color": "#7C3AED" } }
   ],
+
+  "resolve": { "scale": { "y": "shared" } },
+
   "config": {
-    "axisY": {"domain": true, "ticks": true, "grid": true},
-    "view": {"stroke": null},
+    "axisY": { "domain": true, "ticks": true, "grid": true },
+    "view": { "stroke": null },
     "background": "white"
   }
 }
