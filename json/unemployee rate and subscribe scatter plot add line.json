@@ -1,8 +1,8 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
   "description": "Bubble chart with a global linear regression line.",
-  "width": 460,
-  "height": 240,
+  "width": 300,
+  "height": 180,
   "data": {
     "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/main/Global_YouTube_Statistics_UTF8.csv",
     "format": {
@@ -113,4 +113,5 @@
     "legend": { "orient": "right" }
   }
 }
+
 
