@@ -1,0 +1,115 @@
+{
+  "$schema": "https://vega.github.io/schema/vega-lite/v6.json",
+  "description": "Bubble chart with a global linear regression line.",
+  "width": 720,
+  "height": 460,
+  "data": {
+    "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/main/Global_YouTube_Statistics_UTF8.csv",
+    "format": {
+      "type": "csv",
+      "parse": {
+        "subscribers": "number",
+        "Unemployment rate": "number",
+        "Population": "number"
+      }
+    }
+  },
+  "transform": [
+    { "filter": "isValid(datum.Country) && datum.Country !== '' && lower(toString(datum.Country)) !== 'nan'" },
+    { "filter": "isFinite(datum['Unemployment rate']) && isFinite(datum.subscribers) && isFinite(datum.Population)" },
+    {
+      "aggregate": [
+        { "op": "mean", "field": "subscribers", "as": "avg_subs" },
+        { "op": "mean", "field": "Unemployment rate", "as": "unemp" },
+        { "op": "mean", "field": "Population", "as": "pop" }
+      ],
+      "groupby": ["Country"]
+    },
+    { "filter": "isFinite(datum.avg_subs) && isFinite(datum.unemp) && isFinite(datum.pop)" },
+    {
+      "lookup": "Country",
+      "from": {
+        "data": {
+          "values": [
+            { "Country": "United States", "Region": "North America" },
+            { "Country": "Canada", "Region": "North America" },
+            { "Country": "Mexico", "Region": "North America" },
+            { "Country": "Brazil", "Region": "South America" },
+            { "Country": "Argentina", "Region": "South America" },
+            { "Country": "Chile", "Region": "South America" },
+            { "Country": "United Kingdom", "Region": "Europe" },
+            { "Country": "France", "Region": "Europe" },
+            { "Country": "Germany", "Region": "Europe" },
+            { "Country": "Italy", "Region": "Europe" },
+            { "Country": "Spain", "Region": "Europe" },
+            { "Country": "Netherlands", "Region": "Europe" },
+            { "Country": "Sweden", "Region": "Europe" },
+            { "Country": "Poland", "Region": "Europe" },
+            { "Country": "Russia", "Region": "Europe" },
+            { "Country": "Turkey", "Region": "Europe" },
+            { "Country": "India", "Region": "Asia" },
+            { "Country": "China", "Region": "Asia" },
+            { "Country": "Japan", "Region": "Asia" },
+            { "Country": "South Korea", "Region": "Asia" },
+            { "Country": "Indonesia", "Region": "Asia" },
+            { "Country": "Thailand", "Region": "Asia" },
+            { "Country": "Philippines", "Region": "Asia" },
+            { "Country": "Pakistan", "Region": "Asia" },
+            { "Country": "Bangladesh", "Region": "Asia" },
+            { "Country": "Malaysia", "Region": "Asia" },
+            { "Country": "Vietnam", "Region": "Asia" },
+            { "Country": "Saudi Arabia", "Region": "Asia" },
+            { "Country": "United Arab Emirates", "Region": "Asia" },
+            { "Country": "Israel", "Region": "Asia" },
+            { "Country": "Australia", "Region": "Oceania" },
+            { "Country": "New Zealand", "Region": "Oceania" },
+            { "Country": "South Africa", "Region": "Africa" },
+            { "Country": "Nigeria", "Region": "Africa" },
+            { "Country": "Egypt", "Region": "Africa" },
+            { "Country": "Kenya", "Region": "Africa" },
+            { "Country": "Morocco", "Region": "Africa" }
+          ]
+        },
+        "key": "Country",
+        "fields": ["Region"]
+      }
+    },
+    { "calculate": "isValid(datum.Region) ? datum.Region : 'Other'", "as": "Region" }
+  ],
+  "layer": [
+    {
+      "mark": { "type": "circle", "opacity": 0.75, "stroke": "white" },
+      "encoding": {
+        "x": { "field": "unemp", "type": "quantitative", "title": "Unemployment Rate (%)" },
+        "y": { "field": "avg_subs", "type": "quantitative", "title": "Average Subscribers (country)" },
+        "size": { "field": "pop", "type": "quantitative", "title": "Population", "scale": { "type": "sqrt" } },
+        "color": { "field": "Region", "type": "nominal", "title": "Region" },
+        "tooltip": [
+          { "field": "Country", "type": "nominal" },
+          { "field": "Region", "type": "nominal" },
+          { "field": "unemp", "type": "quantitative", "title": "Unemployment rate" },
+          { "field": "avg_subs", "type": "quantitative", "title": "Avg subscribers" },
+          { "field": "pop", "type": "quantitative", "title": "Population" }
+        ]
+      }
+    },
+    {
+      "transform": [
+        {
+          "regression": "avg_subs",
+          "on": "unemp",
+          "as": ["unemp", "avg_subs"]
+        }
+      ],
+      "mark": { "type": "line", "color": "red", "size": 2 },
+      "encoding": {
+        "x": { "field": "unemp", "type": "quantitative" },
+        "y": { "field": "avg_subs", "type": "quantitative" }
+      }
+    }
+  ],
+  "config": {
+    "view": { "stroke": null },
+    "legend": { "orient": "right" }
+  }
+}
