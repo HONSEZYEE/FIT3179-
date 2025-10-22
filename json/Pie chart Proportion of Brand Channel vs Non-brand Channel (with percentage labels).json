@@ -1,6 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "description": "Donut chart: Brand vs Non-Brand Channels (with percentage labels)",
+  "width": 360,
+  "height": 200
   "data": { 
     "url": "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/YouTube_channels.csv" 
   },
@@ -57,3 +58,4 @@
   "width": 400,
   "height": 400
 }
+
