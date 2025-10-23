@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Global YouTube Statistics Dashboard</title>
+  <title>YouTube Analytics Around the World</title>
 
-  <!-- Vega / Vega-Lite / vega-embed -->
   <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-lite@5"></script>
   <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
@@ -12,173 +11,257 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
-    :root {
-      --maxw: 1200px;
+    :root{
+      --maxw: 2200px;
       --card-bg: #ffffff;
       --border: #e5e7eb;
       --muted: #6b7280;
       --gap: 28px;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *{ box-sizing:border-box; margin:0; padding:0; }
 
-    body {
-      font-family: "Open Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-      background: #f5f6fa;
-      color: #111827;
-      line-height: 1.6;
+    body{
+      font-family: "Open Sans", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #eadef7; 
+      color:#111827;
+      line-height:1.6;
     }
 
-    header {
-    background: var(--card-bg);
-    border-bottom: 1px solid var(--border);
-    padding: 32px 16px;
-    display: flex;
-    justify-content: center;
+    header{
+      background: #48286e;
+      border-bottom: 1px solid var(--border);
+      padding: 32px 16px;
+      display:flex;
+      justify-content:center;
     }
 
-    header .container {
-    max-width: var(--maxw);  /* ✅ 与 main 一致 */
-    text-align: justify;
-    background: var(--card-bg);
-    border-radius: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    padding: 32px 40px;
-    }
 
-    header h1 {
-    text-align: center;
-    font-size: 30px;
-    margin-bottom: 10px;
-    }
-
-    header p {
-    color: var(--muted);
-    font-size: 16px;
-    text-align: justify;
-    }
-
+    header h1{ text-align:center; font-size:52px; margin-bottom:10px; color: #ffffff;  }
+    header p{ color:var(--muted); font-size:36px; text-align:justify; color: #ffffff; }
 
     main {
-      max-width: var(--maxw);
+      width: 90%;
+      max-width: none;
       margin: 0 auto;
       padding: 32px 16px;
     }
 
+
     section {
-      margin-bottom: var(--gap);
+      width: 95%;
+      margin: 0 auto var(--gap) auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 24px 32px;
+    }
+
+
+    h2{ font-size:36px; margin-bottom:6px; }
+    section h2{ text-align:center; margin-bottom:8px; }
+    section p{ text-align:center; max-width:1100px; margin:0 auto; }
+    .muted{ color:var(--muted); font-size:24px; }
+
+    .chart{ margin-top:12px; }
+
+
+    .center-wrap{
+      display:flex; justify-content:center; align-items:center;
+    }
+    .two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: stretch;
+    }
+    .two-col .cell{ min-width:0; } 
+    .left-right{
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 24px;
+      align-items: center;
+    }
+    .explain-box{
+      border:1px dashed var(--border);
+      border-radius:12px;
+      padding:16px;
+      color:#4b5563;
+      background:#fafafa;
+    }
+    .youtube {
+      color: #b71c1c; 
+      font-weight: 700;
+    }
+
+    footer {
+      background: #48286e;  
+      color: #ffffff;
+      padding: 40px 16px;
+      font-size: 15px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      line-height: 1.6;
+    }
+footer strong {
+  color: #ffffff;
+}
+footer small {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+    .section-split {
+      background: transparent;
+      box-shadow: none;
+      padding: 0;                 
+    }
+
+    .card {
       background: var(--card-bg);
       border-radius: 16px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.05);
       padding: 20px 24px;
     }
 
-    h2 {
-      font-size: 22px;
-      margin-bottom: 6px;
+    .section-split .explain {
+      margin: 14px auto 0;
+      max-width: 1100px;           
     }
 
-    section h2 {
-    text-align: center;
-    margin-bottom: 8px;
+    .muted.explain {
+      text-align: justify;         
+      max-width: 1600px;          
+      margin: 30px auto 50px;      
+      line-height: 1.8;            
+      font-size: 28px;             
+      color: #4b5563;             
+      text-justify: inter-word;   }
+
+    @media (max-width: 900px){
+      .section-split { padding: 0 0 8px; }
     }
 
-    section p {
-    text-align: justify;  /* 多行时保持整齐 */
-    max-width: 800px;
-    margin: 0 auto;       /* 居中段落块 */
-    }
 
-
-
-    .muted { color: var(--muted); font-size: 15px; }
-
-    .chart { margin-top: 12px; }
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      justify-content: space-between;
-    }
-
-    .half {
-      flex: 1 1 calc(50% - 12px);
-      min-width: 400px;
-    }
-
-    footer {
-      text-align: center;
-      color: var(--muted);
-      padding: 40px 16px;
-      font-size: 14px;
-    }
-
-    @media (max-width: 900px) {
-      .half { flex: 1 1 100%; }
-    }
   </style>
 </head>
 
 <body>
-    <header>
+  <header>
     <div class="container">
-    <h1>Global YouTube Statistics Dashboard</h1>
-    <p>
-      This dashboard provides a comprehensive overview of global YouTube patterns through geographic, categorical, financial, and temporal analyses. 
-      It reveals how audiences and creators are distributed worldwide, highlights the most popular content categories, compares creator income across countries, 
-      and illustrates the steady rise in new channel creation over time — together reflecting YouTube’s growing influence as both a creative and economic ecosystem.
-    </p>
-  </div>
-</header>
+      <h1>
+        <span class="youtube">YouTube</span> Analytics Around the World
+      </h1>
 
-    
+      <p>
+        This visualization provides a comprehensive overview of global <span class="youtube">YouTube</span> patterns
+      </p>
+    </div>
+  </header>
 
   <main>
-    <!-- 🌍 地理图 -->
     <section>
-      <h2>Global Subscribers by Country</h2>
+
+      <h2>
+        Global <span class="youtube">YouTube</span> Subscribers by Country
+      </h2>
+
       <p class="muted">Bubble size represents total subscribers aggregated by country.</p>
-      <div id="geo_map" class="chart"></div>
+      <p class="muted">Countries with a large number of subscribers have already shown their names.</p>
+      <div class="center-wrap">
+        <div id="geo_map" class="chart"></div>
+      </div>
+
     </section>
 
-    <!-- 📊 国家比较 -->
-   <section>
-    <h2>Mean Subscribers by Category (Country Select)</h2>
-    <p class="muted">Compare content categories by average subscribers.</p>
-    <div id="bar_avg_subs" class="chart"></div>
-   </section>
+    <section class="section-split">
+      <div class="two-col">
+        <div class="cell card">
+          <h2>Mean Subscribers by Category (Country Select)</h2>
+          <p class="muted">Compare content categories by average subscribers.</p>
+          <div class="center-wrap">
+            <div id="bar_avg_subs" class="chart"></div>
+          </div>
 
-    <!-- 💰 收益分布（单独一排） -->
-   <section>
-    <h2>Highest Monthly Earnings — Country Distribution</h2>
-    <p class="muted">Visualizes income distribution across top-performing countries.</p>
-    <div id="box_income" class="chart"></div>
-   </section>
+        </div>
 
+        <div class="cell card">
+          <h2>Proportion of Brand Channel vs Non-Brand Channel</h2>
+          <p class="muted">Share of channels identified as brand vs non-brand.</p>
+          <div class="center-wrap">
+            <div id="pie_brand" class="chart"></div>
+          </div>
+        </div>
+      </div>
 
-    <!-- ⏳ 时间趋势 -->
+      <p class="muted explain">
+        By analyzing the left chart, which compares the average number of subscribers across different content categories in the selected country, we can identify which types of content are more popular there. The right chart illustrates the structure of channel types. Together, they reveal not only “what kind of content is trending”, but also whether those popular categories are primarily commercial or non-commercial in nature.
+      </p>
+    </section>
+
     <section>
-      <h2>Channel Creation Trend Over Time</h2>
-      <p class="muted">Use the sliders and country selector to explore growth dynamics.</p>
-      <div id="line_trend" class="chart"></div>
+      <div class="center-wrap">
+        <div class="cell">
+          <h2>Channel Creation Trend Over Time</h2>
+          <p class="muted">Use the sliders and country selector to explore growth dynamics.</p>
+          <div id="line_trend" class="chart"></div>
+        </div>
+      </div>
     </section>
+
+    <section class="section-split">
+      <div class="two-col">
+        <div class="cell card">
+          <h2>How Economy Relates to YouTube Popularity</h2>
+          <p class="muted">
+          Countries with lower unemployment rates tend to show higher average subscriber counts, reflecting stronger digital activity and advertising potential.
+          </p>
+
+          <div class="center-wrap">
+            <div id="unemp_scatter_line" class="chart"></div>
+          </div>
+        </div>
+
+        <div class="cell card">
+          <h2>Where Creators Earn the Most</h2>
+          <p class="muted">
+          Income distributions reveal that creator earnings vary widely by country, with some markets showing much greater opportunities for monetization.
+          </p>
+
+
+          <div class="center-wrap">
+            <div id="bar_income" class="chart"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
   </main>
 
   <footer>
-    <small>© 2025 — Built with Vega-Lite | Hosted via GitHub Pages</small>
+    <small>Data Source 1:https://www.kaggle.com/datasets/naniruddhan/global-youtube-statistics-data?utm_source=chatgpt.com</small>
+    <small>Data Source 2:https://www.opendatabay.com/data/web-social/d35cd43d-3e0c-4b9c-98d6-5e9de61d1f87</small>
+    <small>Publish Date:23/10/2025</small>
+    <small>Author Name:HanSiYi</small>
   </footer>
 
   <script>
-    // 替换为你自己的 JSON raw 链接
-    const GEO_MAP_URL     = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Global%20Youtube%20Subscribers%20By%20Country.json";
-    const BAR_AVG_SUBS_URL= "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Bar%20Chart%20The%20average%20subscription%20volume%20per%20country%20and%20per%20channel.json";
-    const BOX_INCOME_URL  = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Bar%20Chart%20The%20income%20of%20uploaders%20from%20different%20countries.json";
-    const LINE_TREND_URL  = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/line%20and%20area%20chart.json";
+    const GEO_MAP_URL       = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Global%20Youtube%20Subscribers%20By%20Country.json";
+    const BAR_AVG_SUBS_URL  = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Bar%20Chart%20The%20average%20subscription%20volume%20per%20country%20and%20per%20channel.json";
+    const PIE_BRAND_URL     = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Pie%20chart%20Proportion%20of%20Brand%20Channel%20vs%20Non-brand%20Channel%20(with%20percentage%20labels).json"; // ← 品牌/非品牌 饼图
+    const LINE_TREND_URL    = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/line%20and%20area%20chart.json";
+    const UNEMP_URL         = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/unemployee%20rate%20and%20subscribe%20scatter%20plot%20add%20line.json"; // ← 失业率×订阅 散点+线
+    const BAR_INCOME_URL    = "https://raw.githubusercontent.com/HONSEZYEE/FIT3179-/refs/heads/main/json/Bar%20Chart%20The%20income%20of%20uploaders%20from%20different%20countries.json";
 
-    vegaEmbed('#geo_map', GEO_MAP_URL, {actions:false}).catch(console.error);
-    vegaEmbed('#bar_avg_subs', BAR_AVG_SUBS_URL, {actions:false}).catch(console.error);
-    vegaEmbed('#box_income', BOX_INCOME_URL, {actions:false}).catch(console.error);
-    vegaEmbed('#line_trend', LINE_TREND_URL, {actions:false}).catch(console.error);
+    vegaEmbed('#geo_map',           GEO_MAP_URL,    {actions:false}).catch(console.error);
+    vegaEmbed('#bar_avg_subs',      BAR_AVG_SUBS_URL,{actions:false}).catch(console.error);
+    vegaEmbed('#pie_brand',         PIE_BRAND_URL,  {actions:false}).catch(console.error);
+    vegaEmbed('#line_trend',        LINE_TREND_URL, {actions:false}).catch(console.error);
+    vegaEmbed('#unemp_scatter_line',UNEMP_URL,      {actions:false}).catch(console.error);
+    vegaEmbed('#bar_income',        BAR_INCOME_URL, {actions:false}).catch(console.error);
   </script>
 </body>
 </html>
