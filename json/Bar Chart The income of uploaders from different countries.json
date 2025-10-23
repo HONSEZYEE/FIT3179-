@@ -39,7 +39,9 @@
         }
       ],
       "groupby": ["Country"]
-    }
+    },
+    { "calculate": "datum.highest_monthly_earnings / 1e6", "as": "earn_millions" }
+
   ],
   "mark": {"type": "boxplot", "extent": 1.5, "median": {"color": "#111827"}},
   "encoding": {
@@ -53,9 +55,10 @@
     "x": {
       "field": "highest_monthly_earnings",
       "type": "quantitative",
-      "title": "Highest Monthly Earnings",
+      "title": "Highest Monthly Earnings (USD, millions)",
       "scale": {"type": "linear", "zero": true, "domain": [0, 2000000]},
-      "axis": {"grid": true, "format": ","}
+      "axis": {
+        "grid": true, "format": ",.1f"}
     },
     "color": {
       "field": "Country",
