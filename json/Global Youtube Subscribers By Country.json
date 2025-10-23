@@ -1,7 +1,7 @@
 {
   "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-  "width": 1020,
-  "height": 638,
+  "width": 867,
+  "height": 543,
   "projection": {"type": "naturalEarth1"},
   "config": {"view": {"stroke": null}},
   "data": {
